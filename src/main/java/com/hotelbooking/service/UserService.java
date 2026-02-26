@@ -6,6 +6,7 @@ import com.hotelbooking.dto.UserRegistrationRequest;
 import com.hotelbooking.entity.User;
 import com.hotelbooking.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class UserService {
     
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
@@ -31,6 +33,19 @@ public class UserService {
     }
     
     public UserDTO registerUser(UserRegistrationRequest request) {
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            throw new RuntimeException("Username is required");
+        }
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("Email is required");
+        }
+        if (request.getPassword() == null || request.getPassword().length() < 6) {
+            throw new RuntimeException("Password must be at least 6 characters");
+        }
+        if (request.getFullName() == null || request.getFullName().trim().isEmpty()) {
+            throw new RuntimeException("Full name is required");
+        }
+
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
@@ -41,7 +56,7 @@ public class UserService {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword()); // In production, hash the password
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
         user.setPhone(request.getPhone());
         
@@ -53,7 +68,7 @@ public class UserService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
         
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid username or password");
         }
         

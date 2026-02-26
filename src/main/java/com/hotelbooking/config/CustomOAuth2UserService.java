@@ -24,6 +24,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = oauth2User.getAttribute("email");
         String name = oauth2User.getAttribute("name");
         
+        // Fallback for name if not provided by Google
+        if (name == null || name.trim().isEmpty()) {
+            name = oauth2User.getAttribute("given_name");
+            if (name != null) {
+                String familyName = oauth2User.getAttribute("family_name");
+                if (familyName != null) {
+                    name += " " + familyName;
+                }
+            } else {
+                name = email.split("@")[0]; // Use email prefix as fallback
+            }
+        }
+        
         Optional<User> userOptional = userRepository.findByEmail(email);
         User user;
         if (userOptional.isPresent()) {
