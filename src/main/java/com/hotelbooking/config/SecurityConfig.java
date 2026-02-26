@@ -1,5 +1,6 @@
 package com.hotelbooking.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,7 +17,11 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oauth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -27,13 +32,15 @@ public class SecurityConfig {
                 // Apply our CORS config bean
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Stateless session (no server-side sessions)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
                 // Permit ALL API endpoints — authentication is handled by the app layer
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll()
-                        .anyRequest().permitAll());
+                        .requestMatchers("/api/**", "/login/**", "/oauth2/**").permitAll()
+                        .anyRequest().permitAll())
+
+                // Enable OAuth2 Login
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                        .successHandler(oauth2LoginSuccessHandler));
 
         return http.build();
     }

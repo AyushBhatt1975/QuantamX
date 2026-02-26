@@ -8,6 +8,7 @@ import { HotelsPage } from './pages/HotelList';
 import { HotelDetailsPage } from './pages/HotelDetailsPage';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { OAuth2Callback } from './pages/OAuth2Callback';
 import { Dashboard } from './pages/Dashboard';
 import { BookingConfirmation } from './pages/BookingConfirmation';
 
@@ -25,6 +26,7 @@ function App() {
                 <Route path="/hotel/:id" element={<HotelDetailsPage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/oauth2/callback" element={<OAuth2Callback />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/booking-confirmation/:id" element={<BookingConfirmation />} />
                 {/* Catch-all redirect */}

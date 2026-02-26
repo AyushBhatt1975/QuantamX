@@ -23,7 +23,7 @@ function FieldError({ msg }) {
 }
 
 export function Register() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
+  const [form, setForm] = useState({ fullName: '', username: '', email: '', phone: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const [showPwd, setShowPwd] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -33,7 +33,8 @@ export function Register() {
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = 'Full name is required';
+    if (!form.fullName.trim()) e.fullName = 'Full name is required';
+    if (!form.username.trim()) e.username = 'Username is required';
     if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) e.email = 'Enter a valid email address';
     if (form.phone && !form.phone.match(/^[+]?[\d\s\-()]{8,15}$/)) e.phone = 'Enter a valid phone number';
     if (form.password.length < 6) e.password = 'Password must be at least 6 characters';
@@ -49,7 +50,13 @@ export function Register() {
 
     setSubmitting(true);
     try {
-      await register({ name: form.name, email: form.email, phone: form.phone, password: form.password });
+      await register({
+        fullName: form.fullName,
+        username: form.username,
+        email: form.email,
+        phone: form.phone,
+        password: form.password
+      });
       addToast('Account created successfully! Welcome to StayLux 🎉', 'success');
       navigate('/dashboard');
     } catch (err) {
@@ -109,9 +116,19 @@ export function Register() {
               <label htmlFor="reg-name" style={{ display: 'block', color: 'var(--muted)', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
                 Full Name *
               </label>
-              <input id="reg-name" type="text" placeholder="Rajan Sharma" value={form.name}
-                onChange={set('name')} className="input-field" />
-              <FieldError msg={errors.name} />
+              <input id="reg-name" type="text" placeholder="Rajan Sharma" value={form.fullName}
+                onChange={set('fullName')} className="input-field" />
+              <FieldError msg={errors.fullName} />
+            </div>
+
+            {/* Username */}
+            <div>
+              <label htmlFor="reg-username" style={{ display: 'block', color: 'var(--muted)', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                Username *
+              </label>
+              <input id="reg-username" type="text" placeholder="yourusername" value={form.username}
+                onChange={set('username')} className="input-field" />
+              <FieldError msg={errors.username} />
             </div>
 
             {/* Email */}

@@ -15,11 +15,11 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const login = useCallback(async (email, password) => {
+  const login = useCallback(async (username, password) => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await authService.login({ email, password });
+      const { data } = await authService.login({ username, password });
       const userData = { ...data };
       localStorage.setItem('staylux_user', JSON.stringify(userData));
       setUser(userData);
@@ -59,7 +59,7 @@ export function AuthProvider({ children }) {
   const clearError = useCallback(() => setError(null), []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, clearError, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, setUser, loading, error, login, register, logout, clearError, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );
